@@ -1,0 +1,80 @@
+000100220121/*----------------------------------------------------------------------------*/
+000200220121/* Program Id:     OER120CL                                                   */
+000300220121/* Author:         Jeff Campbell                                              */
+000400220121/* Program Desc.:  Validate Order Ship to Address                             */
+000500220121/* Date Created:   01/21/2022                                                 */
+000600220121/*----------------------------------------------------------------------------*/
+000700220121/* 1.000 01/21/2022 JTC Original                                              */
+000800220121/*----------------------------------------------------------------------------*/
+000900220121
+001000220121Pgm
+001100220121
+001200220121  DclPrcOpt DftActGrp(*NO) ActGrp(RPC)
+001300220121
+001400220121  Dcl Var(&jobNbr) Type(*CHAR) LEN(6)
+001500220121  Dcl Var(&jobType) Type(*CHAR) LEN(1)
+001600220121  Dcl Var(&rmvPoiLib) Type(*LGL) Value('1')
+001700220121  Dcl Var(&poiFolder) Type(*CHAR) LEN(30)
+001800220121  Dcl Var(&classPath) Type(*CHAR) LEN(1000)
+001900220121  Dcl Var(&rptDir) Type(*CHAR) LEN(12)
+002000220121  Dcl Var(&rptName) Type(*CHAR) LEN(10)
+002100220121  Dcl Var(&rptPath) Type(*CHAR) LEN(28)
+002200220121  Dcl Var(&emlRptId) Type(*INT) LEN(4)
+002300220121
+002400220121  RtvJobA Nbr(&jobNbr) Type(&jobType)
+002500220121
+002600220121  If Cond(&jobType *NE '0') Then(Do)
+002700220121    SbmJob Cmd(Call Pgm(OER120CL)) +
+002800220121           Job(OER120CL) JobQ(QBATCH2)
+002900220121  EndDo
+003000220121  Else Cmd(Do)
+003100220121    Call Pgm(OER120)
+003200220121
+003300220121    ChgVar Var(&poiFolder) Value('/Home/Java/Lib/Apache/poi-3.8/')
+003400220121
+003500220121    ChgVar +
+003600220121      Var(&classPath) +
+003700220121      Value(&poiFolder || 'poi-3.8-20120326.jar:' || +
+003800220121            &poiFolder || 'poi-examples-3.8-20120326.jar:' || +
+003900220121            &poiFolder || 'poi-excelant-3.8-20120326.jar:' || +
+004000220121            &poiFolder || 'poi-ooxml-3.8-20120326.jar:' || +
+004100220121            &poiFolder || 'poi-ooxml-schemas-3.8-20120326.jar:' || +
+004200220121            &poiFolder || 'poi-scratchpad-3.8-20120326.jar:' || +
+004300220121            &poiFolder || 'ooxml-lib/dom4j-1.6.1.jar:' || +
+004400220121            &poiFolder || 'ooxml-lib/stax-api-1.0.1.jar:' || +
+004500220121            &poiFolder || 'ooxml-lib/xmlbeans-2.3.0.jar')
+004600220121
+004700220121    AddEnvVar EnvVar(CLASSPATH) Value(&classPath) Replace(*YES)
+004800220121
+004900220121    AddEnvVar EnvVar(JAVA_HOME) +
+005000220121              Value('/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit') +
+005100220121              Replace(*YES)
+005200220121
+005300220121    AddLibLe Lib(LIBPOI) Position(*LAST)
+005400220121    MonMsg MsgId(Cpf2103) Exec(Do)
+005500220121      ChgVar Var(&rmvPoiLib) Value('0')
+005600220121    EndDo
+005700220121
+005800220121    ChgVar Var(&rptDir) Value('/temp/' || &jobNbr)
+005900220121    CrtDir Dir(&rptDir)
+006000220121
+006100220121    ChgVar Var(&rptName) Value('OrdAdrErr')
+006200220121    Call Pgm(OER121) Parm(&rptDir &rptName)
+006300220121    ChgVar Var(&rptPath) Value(&rptDir || '/' || &rptName |< '.xlsx')
+006400220121    ChgVar Var(&emlRptId) Value(262)
+006500220121    Call Pgm(EmlRptPgm) Parm(&emlRptId &rptPath)
+006600220121    Del ObjLnk(&rptPath)
+006700220121
+006800220121    RmvDir Dir(&rptDir)
+006900220121    MonMsg MsgId(CPFA0AC)
+007000220121
+007100220121    If Cond(&rmvPoiLib) Then(Do)
+007200220121       RmvLibLe Lib(LibPoi)
+007300220121    EndDo
+007400220121
+007500220121    RmvEnvVar EnvVar(CLASSPATH)
+007600220121    RmvEnvVar EnvVar(JAVA_HOME)
+007700220121  EndDo
+007800220121
+007900220121EndPgm:
+008000220121EndPgm
