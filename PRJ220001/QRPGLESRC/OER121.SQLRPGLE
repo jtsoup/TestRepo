@@ -2,7 +2,7 @@
 000200220121
 000300220121//--------------------------------------------------------------------------------------------------
 000400220121// Program Id:     OER121
-000500220121// Author:         Oscar Campbell
+000500220121// Author:         Jeff Campbell
 000600220121// Program Desc.:  Validate Order Ship to Address Error Report
 000700220121// Date Created:   01/21/2022
 000800220121//
