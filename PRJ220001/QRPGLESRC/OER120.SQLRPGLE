@@ -3,7 +3,7 @@
 000300220121//--------------------------------------------------------------------------------------------------
 000400220123// Program Id:     OER120
 000500220121// Author:         Jeff Campbell
-000600220124// Program Desc.:  Validate Order Ship to Address and stuff
+000600220124// Program Desc.:  Validate Order Ship to Address
 000700220121// Date Created:   01/21/2022
 000800220121//
 000900220121// This program must be compiled with library ATI in the library list.
